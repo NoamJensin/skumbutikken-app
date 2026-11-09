@@ -19,7 +19,7 @@ Appen er kun intern. Den kræver personligt login, viser `noindex` til søgemask
 
 1. ✅ GitHub-repo `NoamJensin/skumbutikken-app` (offentligt) med GitHub Pages via Actions – udgives automatisk ved hvert push til `main`.
 2. ✅ Installér appen på tablets: åbn adressen i Chrome → menu → *Føj til startskærm*.
-3. **Luk for fremmede tilmeldinger i Supabase:** Dashboard → Authentication → Sign In / Providers → slå **"Allow new users to sign up"** fra. Kun administrator opretter medarbejdere i appen.
+3. ✅ **Fremmede tilmeldinger er spærret** i databasen (migration 0007): kun brugere oprettet af administrator i appen kan oprettes. (Kan desuden slås fra i Dashboard → Authentication → Sign In / Providers → "Allow new users to sign up".)
 4. **Slå beskyttelse mod lækkede adgangskoder til:** Authentication → Passwords → "Prevent use of leaked passwords" (kræver Pro-plan).
 5. **Log ind** som `noam@jensin.net` med den midlertidige adgangskode, opret din PIN, og skift adgangskode under *Administration → Min profil*.
 6. **Opret medarbejdere** under *Administration → Medarbejdere* (Jørn som Butik, Fehmina og Susanne som Skrædder). Appen viser en midlertidig adgangskode, som medarbejderen bruger første gang.
