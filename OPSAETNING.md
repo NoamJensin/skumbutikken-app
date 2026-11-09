@@ -62,9 +62,23 @@ Databaseændringer ligger i `supabase/migrations/` i den rækkefølge, de er anv
 ## Backup
 Gratis-planen har ingen automatiske daglige backups. Før appen bruges til rigtige ordrer, bør projektet opgraderes til **Pro** (daglige backups med 7 dages historik). Gendannelse skal afprøves én gang efter opgraderingen.
 
-## Endnu ikke bygget (fase 2–4)
-- Skum- og stofbestillingslister (kl. 18.30), leverandører og modtagelse af materialer
-- Placering af varer, QR-mærkater og delvis afhentning
+## Fase 2 – bestillinger og materialer
+- **Materialebehov** dannes automatisk, når kunden bekræfter en ordreversion: skum, stof, lynlås og tilbehør pr. ordredel. "Fra lager" og "Kunden medbringer" markeres uden indkøb.
+- **Skumlisten og stof-/tilbehørslisten** dannes på serveren (pg_cron, tjek hvert 5. minut) på de valgte bestillingsdage. Standard er kl. 18.30 dansk tid, mandag til fredag. Begge kan ændres under *Bestillinger → Tidsplan*. Det virker, selv når alle enheder er slukket.
+  - Sommer- og vintertid håndteres via tidszonen Europe/Copenhagen.
+  - Hvert indkøbsbehov kommer kun med én gang. Det sikres af en lås, en unik kørsel pr. type og dag og en kobling til én liste. Genkørsel og parallelle job er derfor ufarlige.
+  - Ordrer bekræftet efter cutoff kommer med på næste liste.
+  - Efter driftsstop indhentes manglende kørsler (op til 14 dage).
+  - Ekstra kørsel: knapperne "Dan skumliste nu" og "Dan stofliste nu".
+- **Status for en liste:** Klargjort → Godkendt → Sendt → Bekræftet → Modtaget. Stoflinjer skal have en mængde i meter, før listen kan markeres sendt.
+- **Ændringer efter afsendelse:** den gamle linje markeres "Rettet" og skal følges op. Der oprettes en ny linje som rettelse, og butikken får en notifikation (fanen *Rettelser*).
+- **Modtagelse** registreres pr. linje og delmængde (delvis modtaget). Skrædderen får besked, når materialer er modtaget, og ser materialestatus pr. del.
+- **Eksport** som CSV (åbner i Excel) og udskrift/PDF.
+- **Leverandører** og standardleverandør pr. kategori. Afsendelse til leverandøren sker indtil videre manuelt, og så markeres listen "Sendt".
+- **Placering** af ordren, **indleverede ting** (fx kundens gamle hynder) med udlevering, og **QR-etiketter** pr. ordre og pr. del. QR-koden åbner ordren i appen og kræver login.
+
+## Endnu ikke bygget (fase 3–4)
+- Delvis afhentning pr. del og restmaterialer
 - Fakturaer efter skabelonen, bankprofiler, kreditnota og fakturamail
 - SMS og e-mail til kunder, påmindelser, web-push
 - Kapacitet pr. skrædder, restmaterialer, reklamationer, prisregler og automatisk skummål

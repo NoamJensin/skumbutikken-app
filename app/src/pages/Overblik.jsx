@@ -65,17 +65,19 @@ export default function Overblik() {
   const { employee } = useAuth()
   const since = new Date(Date.now() - 42 * 86400000).toISOString()
   const q = useLiveQuery(['orders', 'tailor_tasks', 'comments', 'order_parts'], async () => {
-    const [o, recent, c, tl] = await Promise.all([
+    const [o, recent, c, tl, ml, ob] = await Promise.all([
       supabase.from('orders').select('id, order_no, title, status, deadline, needs_reconfirm, prepared_version, confirmed_version, priority, price_mode, discount_ore, deposit_ore, updated_at, customers(name), tailor_tasks(status, progress, pause_reason, tailor_id), order_parts(quantity, unit_price_ore)')
         .not('status', 'in', '(afhentet,annulleret)').order('deadline', { ascending: true, nullsFirst: false }),
       supabase.from('orders').select('id, order_no, title, status, created_at, updated_at, customers(name)').gte('created_at', since).order('updated_at', { ascending: false }).limit(400),
       supabase.from('comments').select('id, body, created_at, order_id, orders(order_no, title), employees!comments_author_fkey(display_name)')
         .eq('is_question', true).eq('resolved', false).order('created_at', { ascending: false }),
-      supabase.from('employees').select('id, display_name').eq('role', 'skraedder').eq('active', true).order('sort_order')
+      supabase.from('employees').select('id, display_name').eq('role', 'skraedder').eq('active', true).order('sort_order'),
+      supabase.from('material_lines').select('status, follow_up_done').in('status', ['afventer', 'paa_liste', 'bestilt', 'bekraeftet', 'delvis', 'rettet']),
+      supabase.from('order_batches').select('id, status').in('status', ['dannet', 'godkendt'])
     ])
-    const e = [o, recent, c, tl].find((r) => r.error)
+    const e = [o, recent, c, tl, ml, ob].find((r) => r.error)
     if (e) throw new Error(e.error.message)
-    return { orders: o.data, recent: recent.data, questions: c.data, tailors: tl.data }
+    return { orders: o.data, recent: recent.data, questions: c.data, tailors: tl.data, mats: ml.data, batchesOpen: ob.data }
   })
 
   const head = (
@@ -93,7 +95,7 @@ export default function Overblik() {
   if (q.error) return <div className="page">{head}<div className="err">{q.error}</div></div>
   if (!q.data) return <div className="page">{head}<div className="muted pad">Henter…</div></div>
 
-  const { orders, recent, questions, tailors } = q.data
+  const { orders, recent, questions, tailors, mats, batchesOpen } = q.data
   const task = (o) => (o.tailor_tasks && o.tailor_tasks[0]) || null
   const control = orders.filter((o) => o.status === 'til_kontrol')
   const paused = orders.filter((o) => task(o) && task(o).status === 'pause')
@@ -101,6 +103,12 @@ export default function Overblik() {
   const deadline = orders.filter((o) => o.deadline && daysUntil(o.deadline) <= 3 && o.status !== 'klar_til_afhentning')
   const ready = orders.filter((o) => o.status === 'klar_til_afhentning')
   const drafts = orders.filter((o) => o.status === 'kladde' && !o.needs_reconfirm)
+  const matStats = [
+    ['Lister der venter på godkendelse/afsendelse', batchesOpen.length, 'amber'],
+    ['Materialer bestilt, ikke modtaget', mats.filter((m) => ['paa_liste', 'bestilt', 'bekraeftet', 'delvis'].includes(m.status)).length, 'blue'],
+    ['Afventer næste bestillingsliste', mats.filter((m) => m.status === 'afventer').length, 'grey'],
+    ['Rettelser til opfølgning', mats.filter((m) => m.status === 'rettet' && !m.follow_up_done).length, 'red']
+  ]
   const attention = questions.length + control.length + paused.length + awaiting.filter((o) => o.needs_reconfirm).length + deadline.filter((o) => daysUntil(o.deadline) < 0).length
   const value = orders.filter((o) => o.confirmed_version).reduce((s, o) => s + totals(o.order_parts, o).total_ore, 0)
 
@@ -212,6 +220,8 @@ export default function Overblik() {
           render={(o) => orderLi(o, <Chip kind={daysUntil(o.deadline) < 0 ? 'red' : 'amber'}>{daysUntil(o.deadline) < 0 ? 'Overskredet' : date(o.deadline)}</Chip>)} />
         <Attn title="Afventer kundens bekræftelse" tone="blue" items={awaiting} empty="Ingen" render={(o) => orderLi(o, o.needs_reconfirm ? <Chip kind="red">Ændret</Chip> : <Chip kind="amber">Klar</Chip>)} />
         <Attn title="Klar til afhentning" tone="green" items={ready} empty="Ingen varer klar" render={(o) => orderLi(o, <Chip kind="green">Klar</Chip>)} />
+        <Attn title="Materialer og bestillinger" tone="blue" items={matStats.filter((m) => m[1] > 0)} empty="Ingen åbne bestillinger"
+          render={(m) => <li key={m[0]}><button className="li-btn" onClick={() => nav('/bestillinger')}><span>{m[0]}</span><span className="grow" /><Chip kind={m[2]}>{m[1]}</Chip></button></li>} />
       </div>
     </div>
   )

@@ -8,6 +8,7 @@ import { Chip, Field, Modal, SaveState, Segmented, Toast } from '../components/u
 import { TextIn, NumIn, IntIn, KrIn } from '../components/inputs'
 import { CustomerFields, NewCustomerModal } from '../components/CustomerForm'
 import PartPhotos from '../components/PartPhotos'
+import { OrderMaterials, OrderIntake } from '../components/OrderExtras'
 import { STATUS, TASK, PART_TYPES, FOAM_TYPES, kr, dateTime, totals } from '../lib/format'
 
 // ---------- Ny ordre ----------
@@ -250,6 +251,9 @@ export default function OrdreEditor() {
         </div>
         {order.status === 'klar_til_afhentning' && <p className="muted">Faktura og automatisk kundebesked kommer i fase 3.</p>}
       </section>
+
+      {order.confirmed_version && <OrderMaterials orderId={id} parts={d.parts} />}
+      <OrderIntake order={o} locked={locked} onLocation={(v) => saver.set('location', v)} />
 
       <Comments orderId={id} comments={d.comments} canResolve />
 

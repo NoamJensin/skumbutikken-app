@@ -53,3 +53,15 @@ export const PART_TYPES = {
 export const ROLE = { admin: 'Administrator', butik: 'Butik', skraedder: 'Skrædder' }
 export const FOAM_TYPES = ['22 HL', '22 HL Profil', '27 HR', '32 HR', '36 HR', '50 HR', 'Celciusskum (visco)', 'Latex', 'Bonded', 'Indlægsskum 22 kg']
 export const STAGES = ['Tilskæring', 'Syning', 'Montering', 'Finish']
+
+export const MAT_STATUS = {
+  afventer: ['Afventer liste', 'amber'], paa_liste: ['På liste', 'blue'], bestilt: ['Bestilt', 'blue'],
+  bekraeftet: ['Bekræftet', 'blue'], delvis: ['Delvis modtaget', 'amber'], modtaget: ['Modtaget', 'green'],
+  lager: ['Fra lager', 'green'], kunde: ['Kunden medbringer', 'grey'], annulleret: ['Annulleret', 'grey'], rettet: ['Rettet', 'red']
+}
+export const MAT_CAT = { skum: 'Skum', stof: 'Stof', lynlaas: 'Lynlås', tilbehoer: 'Tilbehør' }
+export const BATCH_STATUS = {
+  dannet: ['Klargjort', 'amber'], godkendt: ['Godkendt', 'blue'], sendt: ['Sendt', 'blue'], bekraeftet: ['Bekræftet af leverandør', 'blue'], modtaget: ['Modtaget', 'green']
+}
+export const WEEKDAYS = [[1, 'Man'], [2, 'Tir'], [3, 'Ons'], [4, 'Tor'], [5, 'Fre'], [6, 'Lør'], [7, 'Søn']]
+export const qty = (n) => (n == null ? '' : String(Number(n)).replace('.', ','))

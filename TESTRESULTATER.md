@@ -30,3 +30,20 @@ Arbejdsmiljøet, hvor appen blev bygget, har ikke netværksadgang til Supabase. 
 - Redigering af samme ordre fra to enheder i brugerfladen
 - Upload af fotos fra tablet-kamera
 - PIN-skift på den fælles tablet og deaktivering af en medarbejder med aktiv session
+
+# Testresultater – fase 2 (10. november 2026)
+
+Testene kørte mod produktionsdatabasen i en transaktion, der blev rullet tilbage, med en administrator og en midlertidig skrædder.
+
+| # | Test | Resultat |
+|---|---|---|
+| F1 | Kundebekræftelse danner materialebehov | ✅ Hynde med betræk, lynlås og tilbehør giver skum, stof, lynlås og tilbehør. Skumdel "fra lager" giver status "Fra lager" uden indkøb |
+| F2 | Ekstra kørsel og genkørsel | ✅ Skumliste med 1 linje og stofliste med 3 linjer. Kørsel igen uden nye behov danner ingen liste |
+| F3 | Afsendelse uden metermål på stof | ✅ Afvist: "Angiv mængde (meter) for alle stoflinjer før afsendelse" |
+| F4 | Ændring af stof efter afsendelse | ✅ Gammel linje "Rettet" med opfølgning, ny linje som rettelse, 1 notifikation |
+| F5 | Delvis modtagelse 1 af 2, derefter 1 mere | ✅ "Delvis", derefter "Modtaget", og listen sættes automatisk til "Modtaget" |
+| F6 | Skrædderens rettigheder | ✅ Ser 0 linjer direkte, men ser materialestatus (5) i sin opgave og får notifikationer om modtagelse. Kan ikke danne lister |
+| F7 | Sommer- og vintertid | ✅ 18.30 dansk tid giver 16.30 UTC den 1. juli og 17.30 UTC den 10. november |
+| F8 | Cutoff og dobbeltkørsel samme dag | ✅ Linjer bekræftet efter cutoff tages ikke med. Anden planlagte kørsel samme dag springes over |
+| F9 | Indhentning efter driftsstop (sidste kørsel for 6 dage siden) | ✅ Manglende hverdage indhentes og markeres som indhentet. Lørdag og søndag springes over |
+| F10 | Planlagt job i drift | ✅ pg_cron kører `run_scheduled_batches` hvert 5. minut med status "succeeded" |

@@ -6,7 +6,7 @@ import { useAuth } from '../lib/auth'
 import { Chip, Empty, Modal, Field, Toast } from '../components/ui'
 import PartPhotos from '../components/PartPhotos'
 import { Comments } from './OrdreEditor'
-import { TASK, PART_TYPES, STAGES, date, daysUntil } from '../lib/format'
+import { TASK, PART_TYPES, STAGES, MAT_STATUS, MAT_CAT, date, daysUntil } from '../lib/format'
 
 export default function Skraedder() {
   const { employee, isStaff } = useAuth()
@@ -115,6 +115,7 @@ function TaskDetail({ task, onClose, onToast, reload }) {
         <span>Deadline <b>{date(task.order.deadline)}</b></span>
         {task.order.priority === 'hoj' && <Chip kind="red">Haster</Chip>}
         {task.pause_reason && task.status === 'pause' && <span className="muted">Pause: {task.pause_reason}</span>}
+        {task.order.location && <span>Placering <b>{task.order.location}</b></span>}
       </div>
       {task.order.needs_reconfirm && <div className="warn">Ordren er ved at blive ændret og afventer kundens bekræftelse. Vent med de berørte dele.</div>}
       <div className="progress big"><i style={{ width: task.progress + '%' }} /><span>Samlet {task.progress} %</span></div>
@@ -139,7 +140,9 @@ function TaskDetail({ task, onClose, onToast, reload }) {
             {p.fabric && <><span>Lynlås</span><b>{p.zipper ? 'Ja' : 'Nej'}</b></>}
             {p.sewing && <><span>Syning</span><b>{p.sewing}</b></>}
             {p.accessories && <><span>Tilbehør</span><b>{p.accessories}</b></>}
-            <span>Materialer</span><b>{{ bestilles: 'Bestilles', lager: 'Fra lager', kunde: 'Kunden medbringer' }[p.material_source]}</b>
+            <span>Materialer</span><b className="row gap wrap">{(task.materials || []).filter((m) => m.part_id === p.id).length === 0
+              ? ({ bestilles: 'Bestilles', lager: 'Fra lager', kunde: 'Kunden medbringer' }[p.material_source])
+              : (task.materials || []).filter((m) => m.part_id === p.id).map((m, k) => <Chip key={k} kind={MAT_STATUS[m.status][1]}>{MAT_CAT[m.category]}: {MAT_STATUS[m.status][0]}</Chip>)}</b>
             {p.instructions && <><span>Instruktioner</span><b className="pre">{p.instructions}</b></>}
           </div>
           <PartPhotos orderId={task.order.id} partId={p.id} attachments={atts.filter((a) => a.part_id === p.id)} canUpload canDelete={false} onChanged={loadSide} />
