@@ -459,3 +459,7 @@ select cron.schedule('skumbutikken-bestillingslister', '*/5 * * * *', $$select p
 -- (anvendt som separat migration "fmt_cm_trim")
 create or replace function public.fmt_cm(n numeric) returns text
 language sql immutable as $$ select case when n is null then null when n = trunc(n) then trunc(n)::text else replace(trim(to_char(n, 'FM99990.0')), '.', ',') end $$;
+
+-- (migration "phase2_hardening")
+alter function public.fmt_cm(numeric) set search_path = public;
+revoke execute on function public.confirmations_sync_trg(), public.orders_cancel_lines_trg() from authenticated, anon, public;
