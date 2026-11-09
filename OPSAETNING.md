@@ -6,7 +6,7 @@
 |---|---|---|
 | Database, login, liveopdateringer, filer | Supabase-projekt `skumbutikken` (eu-north-1, Stockholm), ref `bxphyanqubgwehhqwzow` | Kører |
 | Medarbejderadministration | Supabase Edge Function `admin-users` | Kører |
-| Selve appen | GitHub Pages via `.github/workflows/deploy.yml` | Klar – kræver repo (se nedenfor) |
+| Selve appen | GitHub Pages via `.github/workflows/deploy.yml` – **https://noamjensin.github.io/skumbutikken-app/** | Kører |
 
 Appen er kun intern. Den kræver personligt login, viser `noindex` til søgemaskiner og er ikke linket fra skumbutikken.dk.
 
@@ -17,8 +17,8 @@ Appen er kun intern. Den kræver personligt login, viser `noindex` til søgemask
 
 ## Første opsætning (gøres én gang)
 
-1. **Opret GitHub-repo** `skumbutikken-app` og læg koden op (Claude gør det, når repoet findes).
-2. **Slå GitHub Pages til:** Repo → Settings → Pages → Source: **GitHub Actions**. Appen udgives automatisk ved hvert push til `main`.
+1. ✅ GitHub-repo `NoamJensin/skumbutikken-app` (offentligt) med GitHub Pages via Actions – udgives automatisk ved hvert push til `main`.
+2. ✅ Installér appen på tablets: åbn adressen i Chrome → menu → *Føj til startskærm*.
 3. **Luk for fremmede tilmeldinger i Supabase:** Dashboard → Authentication → Sign In / Providers → slå **"Allow new users to sign up"** fra. Kun administrator opretter medarbejdere i appen.
 4. **Slå beskyttelse mod lækkede adgangskoder til:** Authentication → Passwords → "Prevent use of leaked passwords" (kræver Pro-plan).
 5. **Log ind** som `noam@jensin.net` med den midlertidige adgangskode, opret din PIN, og skift adgangskode under *Administration → Min profil*.
