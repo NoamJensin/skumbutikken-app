@@ -135,7 +135,7 @@ function TaskDetail({ task, onClose, onToast, reload }) {
             {Number(p.seam_allowance_cm) > 0 && <><span>Sømtillæg</span><b>{f(p.seam_allowance_cm)} cm</b></>}
             <span>Form</span><b>{p.shape}</b>
             {p.foam_type && <><span>Skum</span><b>{p.foam_type}{p.firmness ? ' · ' + p.firmness : ''}</b></>}
-            {p.fabric && <><span>Stof</span><b>{p.fabric}{p.fabric_color ? ' · ' + p.fabric_color : ''}{p.fabric_item_no ? ` (${p.fabric_item_no})` : ''}</b></>}
+            {p.fabric && <><span>Stof</span><b>{p.fabric}{p.fabric_color ? ' · ' + p.fabric_color : ''}</b></>}
             {p.fabric && <><span>Lynlås</span><b>{p.zipper ? 'Ja' : 'Nej'}</b></>}
             {p.sewing && <><span>Syning</span><b>{p.sewing}</b></>}
             {p.accessories && <><span>Tilbehør</span><b>{p.accessories}</b></>}

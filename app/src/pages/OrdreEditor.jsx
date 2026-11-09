@@ -352,12 +352,10 @@ function PartCard({ part, index, uid, locked, errFor, attachments, orderId, onCo
         {foam && <>
           <Field label="Skumtype" error={e('foam_type')}><TextIn value={p.foam_type} onChange={(v) => s.set('foam_type', v)} list="foamtypes" /></Field>
           <Field label="Fasthed"><TextIn value={p.firmness} onChange={(v) => s.set('firmness', v)} placeholder="fx blød / medium / fast" /></Field>
-          <Field label="Skum varenr."><TextIn value={p.foam_item_no} onChange={(v) => s.set('foam_item_no', v)} /></Field>
         </>}
         {fabric && <>
           <Field label="Stof" error={e('fabric')}><TextIn value={p.fabric} onChange={(v) => s.set('fabric', v)} placeholder="fx Kvadrat Hallingdal 65" /></Field>
           <Field label="Farve"><TextIn value={p.fabric_color} onChange={(v) => s.set('fabric_color', v)} /></Field>
-          <Field label="Stof varenr."><TextIn value={p.fabric_item_no} onChange={(v) => s.set('fabric_item_no', v)} /></Field>
           <Field label="Lynlås"><Segmented value={p.zipper ? 'ja' : 'nej'} options={[['nej', 'Nej'], ['ja', 'Ja']]} onChange={(v) => s.set('zipper', v === 'ja', true)} /></Field>
           <Field label="Syning"><TextIn value={p.sewing} onChange={(v) => s.set('sewing', v)} placeholder="fx kantbånd, paspoil" /></Field>
           <Field label="Tilbehør"><TextIn value={p.accessories} onChange={(v) => s.set('accessories', v)} /></Field>

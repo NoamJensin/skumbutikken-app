@@ -21,15 +21,8 @@ export default function Ordrer() {
     if (f === 'klar') query = query.eq('status', 'klar_til_afhentning')
     const { data, error } = await query
     if (error) throw new Error(error.message)
-    let itemHits = null
-    const t = term.trim()
-    if (t.length >= 2) {
-      const { data: parts } = await supabase.from('order_parts').select('order_id')
-        .or(`foam_item_no.ilike.%${t}%,fabric_item_no.ilike.%${t}%`).limit(200)
-      itemHits = new Set((parts || []).map((p) => p.order_id))
-    }
-    return { rows: data, itemHits }
-  }, [f, term])
+    return { rows: data }
+  }, [f])
 
   const t = term.trim().toLowerCase()
   const digits = t.replace(/\D/g, '')
@@ -38,8 +31,7 @@ export default function Ordrer() {
     const c = o.customers || {}
     return (o.order_no || '').includes(t) || (o.title || '').toLowerCase().includes(t) ||
       (c.name || '').toLowerCase().includes(t) || (c.email || '').toLowerCase().includes(t) ||
-      (digits.length >= 3 && (c.phone || '').replace(/\D/g, '').includes(digits)) ||
-      (q.data.itemHits && q.data.itemHits.has(o.id))
+      (digits.length >= 3 && (c.phone || '').replace(/\D/g, '').includes(digits))
   })
 
   return (
@@ -49,7 +41,7 @@ export default function Ordrer() {
         <Link className="btn primary lg" to="/ordrer/ny">＋ Ny ordre</Link>
       </div>
       <div className="toolbar">
-        <input className="search" placeholder="Søg på kunde, telefon, ordrenr. eller varenr." value={term} onChange={(e) => setTerm(e.target.value)} />
+        <input className="search" placeholder="Søg på kunde, telefon, ordrenr. eller overskrift" value={term} onChange={(e) => setTerm(e.target.value)} />
         <Segmented value={f} options={FILTERS} onChange={setF} />
       </div>
       {q.error && <div className="err">{q.error}</div>}
