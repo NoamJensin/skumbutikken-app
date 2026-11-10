@@ -39,10 +39,17 @@ Deno.serve(async (req) => {
     if (password.length < 10) return json({ error: "Adgangskoden skal være mindst 10 tegn" }, 400);
     if (!display_name) return json({ error: "Navn mangler" }, 400);
     if (!ROLES.includes(role)) return json({ error: "Ukendt rolle" }, 400);
+    // Godkend e-mailen til oprettelse (offentlige tilmeldinger er spærret i databasen)
+    const { error: allowErr } = await admin.from("signup_allowlist").upsert({ email, created_at: new Date().toISOString() });
+    if (allowErr) return json({ error: allowErr.message }, 400);
     const { data: created, error } = await admin.auth.admin.createUser({
       email, password, email_confirm: true, user_metadata: { display_name },
     });
-    if (error || !created.user) return json({ error: error?.message || "Kunne ikke oprette bruger" }, 400);
+    if (error || !created.user) {
+      await admin.from("signup_allowlist").delete().eq("email", email);
+      const msg = error?.message || "Kunne ikke oprette bruger";
+      return json({ error: /already/i.test(msg) ? "Der findes allerede en bruger med denne e-mail" : msg }, 400);
+    }
     const { error: e2 } = await admin.from("employees").insert({
       id: created.user.id, email, display_name, role, title,
     });
