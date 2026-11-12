@@ -9,6 +9,7 @@ import { TextIn, NumIn, IntIn, KrIn } from '../components/inputs'
 import { CustomerFields, NewCustomerModal } from '../components/CustomerForm'
 import PartPhotos from '../components/PartPhotos'
 import { OrderMaterials, OrderIntake } from '../components/OrderExtras'
+import { OrderInvoicing } from '../components/InvoiceParts'
 import { STATUS, TASK, PART_TYPES, FOAM_TYPES, kr, dateTime, totals } from '../lib/format'
 
 // ---------- Ny ordre ----------
@@ -249,9 +250,10 @@ export default function OrdreEditor() {
           {isAdmin && order.status === 'kladde' && !order.confirmed_version &&
             <button className="btn ghost danger" onClick={() => act('delete', async () => { if (!confirm('Slet kladden permanent?')) return; const r = await supabase.from('orders').delete().eq('id', id); if (r.error) throw new Error(r.error.message); nav('/ordrer') })}>Slet kladde</button>}
         </div>
-        {order.status === 'klar_til_afhentning' && <p className="muted">Faktura og automatisk kundebesked kommer i fase 3.</p>}
+        {order.status === 'klar_til_afhentning' && <p className="muted">Faktura og afhentningsbesked dannes automatisk – se "Faktura og betaling".</p>}
       </section>
 
+      {order.confirmed_version && <OrderInvoicing order={o} parts={d.parts} onSetBank={(v) => saver.set('bank_profile_id', v, true)} setToast={setToast} />}
       {order.confirmed_version && <OrderMaterials orderId={id} parts={d.parts} />}
       <OrderIntake order={o} locked={locked} onLocation={(v) => saver.set('location', v)} />
 

@@ -4,6 +4,7 @@ import { useLiveQuery } from '../lib/live'
 import { useAuth } from '../lib/auth'
 import { Chip, Field, Modal, Segmented, Toast } from '../components/ui'
 import { SetPinOverlay } from './Login'
+import AdminInvoiceSettings from '../components/AdminInvoiceSettings'
 import { ROLE } from '../lib/format'
 
 function genPassword() {
@@ -30,12 +31,8 @@ export default function Admin() {
         </div>
       </section>
       {isAdmin && <Employees setToast={setToast} />}
-      {isAdmin && (
-        <section className="card glass">
-          <div className="card-head"><h3>Indstillinger</h3></div>
-          <p className="muted">Leverandører, materialetyper, bestillingstidspunkter, beskedskabeloner, bankprofiler og fakturaindstillinger kommer i fase 2–3.</p>
-        </section>
-      )}
+      {isAdmin && <AdminInvoiceSettings setToast={setToast} />}
+      {isAdmin && <section className="card"><div className="card-head"><h3>Leverandører og bestillingstider</h3></div><p className="muted">Findes under Bestillinger → Leverandører og Tidsplan.</p></section>}
       {pin && <SetPinOverlay onDone={async () => { setPin(false); await refreshEmployee(); setToast('PIN gemt') }} />}
       {pw && <PasswordModal onClose={() => setPw(false)} onDone={() => { setPw(false); setToast('Adgangskode ændret') }} />}
       <Toast msg={toast} onDone={() => setToast('')} />

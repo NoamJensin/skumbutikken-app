@@ -2,7 +2,8 @@
 // Kaldes af pg_cron hvert minut og straks efter nye job (pg_net). Kræver x-worker-secret.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import * as PDFLib from "npm:pdf-lib@1.17.1";
-import { renderInvoicePdf } from "./invoice_pdf.js";
+// Rendereren hentes fra repoet, låst til et bestemt commit (uændret skabelon)
+import { renderInvoicePdf } from "https://raw.githubusercontent.com/NoamJensin/skumbutikken-app/eed253923275f3835f60cf9519731d42bbb1688e/supabase/functions/worker/invoice_pdf.js";
 
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { "Content-Type": "application/json" } });
 function bytesToB64(bytes: Uint8Array) {
@@ -35,7 +36,7 @@ Deno.serve(async (req) => {
     try {
       const bytes = await renderInvoicePdf(PDFLib, inv.snapshot, logo);
       const year = String(inv.issued_at).slice(0, 4);
-      const path = `${year}/${inv.kind === "kreditnota" ? "kreditnota" : "faktura"}-${inv.invoice_no}.pdf`;
+      const path = `${year}/${inv.kind === "kreditnota" ? "kreditnota" : "faktura"}-${inv.invoice_no}-${String(inv.id).slice(0, 8)}.pdf`;
       const up = await db.storage.from("fakturaer").upload(path, bytes, { contentType: "application/pdf", upsert: false });
       if (up.error && !/exists|duplicate/i.test(up.error.message)) throw new Error(up.error.message);
       await db.from("invoices").update({ pdf_path: path, pdf_status: "klar", pdf_error: null }).eq("id", inv.id);

@@ -9,10 +9,11 @@ import OrdreEditor, { NewOrder } from './pages/OrdreEditor'
 import Kundevisning from './pages/Kundevisning'
 import Skraedder from './pages/Skraedder'
 import Kunder, { Kundekort } from './pages/Kunder'
-import Afhentning, { Kommer } from './pages/Afhentning'
+import Afhentning from './pages/Afhentning'
 import Admin from './pages/Admin'
 import Bestillinger from './pages/Bestillinger'
 import Etiket from './pages/Etiket'
+import Fakturaer from './pages/Fakturaer'
 
 function Gate() {
   const { ready, employee, locked, isStaff, refreshEmployee } = useAuth()
@@ -35,7 +36,7 @@ function Gate() {
           <Route path="kunder/:id" element={staffOnly(<Kundekort />)} />
           <Route path="afhentning" element={staffOnly(<Afhentning />)} />
           <Route path="bestillinger" element={staffOnly(<Bestillinger />)} />
-          <Route path="fakturaer" element={staffOnly(<Kommer title="Fakturaer" text="Fakturaer efter jeres skabelon, bankprofiler, kreditnotaer og automatisk fakturamail bygges i fase 3." />)} />
+          <Route path="fakturaer" element={staffOnly(<Fakturaer />)} />
           <Route path="admin" element={<Admin />} />
           <Route path="*" element={<Navigate to={isStaff ? '/' : '/skraedder'} replace />} />
         </Route>

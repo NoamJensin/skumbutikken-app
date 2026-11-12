@@ -391,3 +391,17 @@ fieldset:disabled input, fieldset:disabled select, fieldset:disabled textarea { 
   .mat-row > :last-child { display: none; }
   .labels { grid-template-columns: repeat(2, 1fr); } .label { border: 1px solid #999; }
 }
+
+/* ---------- Fakturaer ---------- */
+h3.sub { font-size: .95rem; color: var(--ink2); margin-top: .4rem; }
+.tr.static.inv-row { grid-template-columns: minmax(0, 2fr) 120px 140px auto; }
+.inv-preview { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; gap: .8rem; padding-bottom: 1rem; }
+.inv-preview > * { padding: 0 1.1rem; }
+.ip-head { background: #d0deeb; padding: 1rem 1.1rem !important; display: flex; justify-content: space-between; align-items: center; }
+.ip-head b { font-size: 1.3rem; letter-spacing: .02em; color: #4a4a4a; }
+.ip-lines { display: flex; flex-direction: column; gap: .3rem; } .ip-lines .row span:nth-child(2) { color: var(--muted); }
+.ip-tot { display: grid; grid-template-columns: 1fr auto; gap: .3rem 1rem; margin: 0; } .ip-tot dd { margin: 0; text-align: right; }
+.card .table .tr.static, .table .tr.static { grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) 150px max-content; }
+.tr.static .td:last-child { overflow: visible; justify-content: flex-end; flex-wrap: wrap; }
+.table .tr.static.inv-row { grid-template-columns: minmax(0, 2fr) 120px 140px max-content; }
+@media (max-width: 900px) { .card .table .tr.static, .table .tr.static, .table .tr.static.inv-row { grid-template-columns: minmax(0, 1fr) max-content; } .tr.static .td:nth-child(2), .tr.static .td:nth-child(3) { display: none; } }

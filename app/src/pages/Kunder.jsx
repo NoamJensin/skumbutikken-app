@@ -6,7 +6,8 @@ import { useAuth } from '../lib/auth'
 import { useRowSaver } from '../lib/saver'
 import { Chip, Empty, SaveState } from '../components/ui'
 import { CustomerFields, NewCustomerModal } from '../components/CustomerForm'
-import { STATUS, date } from '../lib/format'
+import { STATUS, date, kr } from '../lib/format'
+import { InvoiceChip, openPdf, MessageList } from '../components/InvoiceParts'
 
 export default function Kunder() {
   const nav = useNavigate()
@@ -50,13 +51,16 @@ export function Kundekort() {
   const { employee } = useAuth()
   const [row, setRow] = useState(null)
   const q = useLiveQuery(['customers', 'orders'], async () => {
-    const [c, o] = await Promise.all([
+    const [c, o, inv, msg] = await Promise.all([
       supabase.from('customers').select('*').eq('id', id).maybeSingle(),
-      supabase.from('orders').select('id, order_no, title, status, deadline, created_at, order_parts(label, quantity, length_cm, width_cm, thickness_cm, foam_type, fabric)').eq('customer_id', id).order('created_at', { ascending: false })
+      supabase.from('orders').select('id, order_no, title, status, deadline, created_at, order_parts(label, quantity, length_cm, width_cm, thickness_cm, foam_type, fabric)').eq('customer_id', id).order('created_at', { ascending: false }),
+      supabase.from('invoices').select('id, invoice_no, kind, issued_at, total_ore, pdf_status, pdf_path, credits_invoice_id').eq('customer_id', id).order('issued_at', { ascending: false }),
+      supabase.from('message_jobs').select('*').eq('customer_id', id).order('created_at', { ascending: false }).limit(50)
     ])
     if (c.error) throw new Error(c.error.message)
     setRow(c.data)
-    return { orders: o.data || [] }
+    const credited = new Set((inv.data || []).filter((i) => i.kind === 'kreditnota').map((i) => i.credits_invoice_id))
+    return { orders: o.data || [], invoices: (inv.data || []).map((i) => ({ ...i, credited: credited.has(i.id) })), jobs: msg.data || [] }
   }, [id])
   const s = useRowSaver({ table: 'customers', row, uid: employee.id, onSaved: setRow })
   if (q.error) return <div className="page err">{q.error}</div>
@@ -81,7 +85,12 @@ export function Kundekort() {
         {active.length ? <div className="table">{active.map(OrderRow)}</div> : <div className="muted">Ingen</div>}</section>
       <section className="card glass"><div className="card-head"><h3>Tidligere ordrer ({past.length})</h3><small className="muted">Åbn en ordre og vælg “Genbestil” for at kopiere mål og materialer</small></div>
         {past.length ? <div className="table">{past.map(OrderRow)}</div> : <div className="muted">Ingen</div>}</section>
-      <section className="card glass"><div className="card-head"><h3>Fakturaer og beskedhistorik</h3></div><div className="muted">Kommer i fase 3.</div></section>
+      <section className="card"><div className="card-head"><h3>Fakturaer ({q.data.invoices.length})</h3></div>
+        {q.data.invoices.length === 0 ? <div className="muted">Ingen fakturaer</div> : <div className="mat-table">{q.data.invoices.map((i) => (
+          <div key={i.id} className="mat-row compact"><span className="mr-cat"><InvoiceChip inv={i} /></span>
+            <span className="mr-main"><b>#{i.invoice_no} · {kr(i.total_ore)}</b><small>{date(i.issued_at)}</small></span>
+            <span className="mr-qty">{i.pdf_status === 'klar' && <button className="btn soft sm" onClick={() => openPdf(i.pdf_path)}>PDF</button>}</span><span /></div>))}</div>}</section>
+      <section className="card"><div className="card-head"><h3>Beskedhistorik</h3></div><MessageList jobs={q.data.jobs} /></section>
     </div>
   )
 }
