@@ -77,8 +77,23 @@ Gratis-planen har ingen automatiske daglige backups. Før appen bruges til rigti
 - **Leverandører** og standardleverandør pr. kategori. Afsendelse til leverandøren sker indtil videre manuelt, og så markeres listen "Sendt".
 - **Placering** af ordren, **indleverede ting** (fx kundens gamle hynder) med udlevering, og **QR-etiketter** pr. ordre og pr. del. QR-koden åbner ordren i appen og kræver login.
 
-## Endnu ikke bygget (fase 3–4)
+## Fase 3 – fakturaer og kundebeskeder
+**Gøres én gang af administrator (Administration → Faktura):**
+1. Kontrollér og godkend firmaoplysningerne (navn, CVR, adresse, kontakt). Der kan ikke udstedes fakturaer, før de er godkendt.
+2. Opret mindst én bankprofil (reg.nr., kontonr., evt. IBAN/MobilePay) og vælg den som standard.
+3. Hvis I fortsætter en eksisterende fakturanummerserie, indtast næste fakturanummer, før den første faktura udstedes. Nummeret kan ikke sættes lavere, når der først er udstedt fakturaer.
+4. Mail og SMS: opret konti hos Resend (mail) og GatewayAPI (SMS). Læg nøglerne som hemmeligheder i Supabase (Edge Functions → Secrets): `RESEND_API_KEY` og `GATEWAYAPI_TOKEN`. Tilføj Resends DNS-poster (SPF, DKIM, DMARC) for skumbutikken.dk hos Gigahost. Indtil det er gjort, står beskeder i køen som "Integration ikke sat op" og sendes automatisk, når nøglerne er lagt ind.
+
+**Daglig brug:**
+- På ordren under "Faktura og betaling": udsted faktura (med forhåndsvisning), registrér betaling (kontant, kort, MobilePay, bankoverførsel) og lav kreditnota med begrundelse.
+- En udstedt faktura kan ikke ændres eller slettes. Rettelser laves altid som kreditnota og eventuelt en ny faktura.
+- PDF'en dannes på serveren efter skabelonen og gemmes privat. Den åbnes fra ordren, kundekortet eller siden Fakturaer.
+- Når en ordre sættes til "Klar til afhentning", sendes fakturamail og en SMS om afhentning automatisk. Mislykkede forsøg prøves igen med stigende pause. Status for hver besked ses på ordren og kundekortet, og beskeder kan gensendes.
+- Siden **Fakturaer** viser alle fakturaer med status for betaling og afsendelse, ordrer der mangler opfølgning, og eksport til CSV for bogholderiet.
+- En påmindelse om ikke-afhentede ordrer dannes automatisk hver time efter de regler, der er sat i Administration.
+
+## Endnu ikke bygget (fase 4)
 - Delvis afhentning pr. del og restmaterialer
-- Fakturaer efter skabelonen, bankprofiler, kreditnota og fakturamail
-- SMS og e-mail til kunder, påmindelser, web-push
+- Leveringskvitteringer fra mail/SMS (webhooks) og web-push
+- Kobling til regnskabsprogram
 - Kapacitet pr. skrædder, restmaterialer, reklamationer, prisregler og automatisk skummål

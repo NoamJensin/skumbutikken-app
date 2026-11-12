@@ -47,3 +47,24 @@ Testene kørte mod produktionsdatabasen i en transaktion, der blev rullet tilbag
 | F8 | Cutoff og dobbeltkørsel samme dag | ✅ Linjer bekræftet efter cutoff tages ikke med. Anden planlagte kørsel samme dag springes over |
 | F9 | Indhentning efter driftsstop (sidste kørsel for 6 dage siden) | ✅ Manglende hverdage indhentes og markeres som indhentet. Lørdag og søndag springes over |
 | F10 | Planlagt job i drift | ✅ pg_cron kører `run_scheduled_batches` hvert 5. minut med status "succeeded" |
+
+# Testresultater – fase 3 (11.–12. november 2026)
+
+Fakturalogikken er testet med SQL mod produktionsdatabasen som administrator og som butiksbruger. Testdata er fjernet bagefter, og fakturanummerserien er nulstillet, så første rigtige faktura bliver nr. 1.
+
+| Område | Test | Resultat |
+|---|---|---|
+| Udstedelse | Faktura uden godkendte firmaoplysninger eller bankprofil | ✅ Afvist med forklaring |
+| Udstedelse | Udstedelse af faktura fra ordre | ✅ Fortløbende nummer, linjer og beløb kopieres fra den bekræftede ordreversion, moms 25 % afrundet i øre |
+| Idempotens | Samme anmodning sendt to gange | ✅ Kun én faktura og ét nummer |
+| Uforanderlighed | Ændring eller sletning af udstedt faktura | ✅ Blokeret af databasen |
+| Kreditnota | Kreditnota med begrundelse | ✅ Eget nummer, negative beløb, kobling til den oprindelige faktura |
+| Betaling | Delbetaling og fuld betaling | ✅ Restbeløb og status "Betalt" opdateres korrekt |
+| Rettigheder | Skrædder forsøger at se fakturaer og betalinger | ✅ 0 rækker |
+| Automatik | Ordre sat til "Klar til afhentning" | ✅ Faktura udstedes og fakturamail og afhentnings-SMS lægges i køen |
+| Beskedkø | Afsendelse uden mail-/SMS-nøgler | ✅ Jobbet frigives med status "Integration ikke sat op" og forsøges igen senere |
+| PDF (i drift) | Server-side PDF af testfaktura | ✅ PDF dannet af worker-funktionen (ca. 65 kB) og gemt i privat lager. Layoutet er sammenlignet visuelt med skabelonen |
+
+## Mangler at blive testet
+- Rigtig afsendelse af mail og SMS. Det kan først testes, når Resend og GatewayAPI er sat op.
+- Udskrift af faktura-PDF på butikkens printer.
